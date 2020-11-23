@@ -21,6 +21,11 @@ function App() {
     fetch('https://restcountries.eu/rest/v2/all?fields=name;capital;languages;currencies;region;subregion;population;area')
       .then(res => res.json())
       .then(res => {
+        res.forEach(item => {
+          if(!item.area) {
+            item.area = 0
+          }
+        });
         setcountries(res);
         setdropDownValues(res);
         sessionStorage.setItem('countriesCopy', JSON.stringify(res));
@@ -40,9 +45,10 @@ function App() {
 
   const handleChange = e => {
     if (e.target.value === '--Select Country--') {
-      fetchCountryList();
+      var fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
+      setcountries(fetchCountries);
     } else {
-      var storedCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
+      const storedCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
       const filteredCountry = storedCountries.filter(country => country.name === e.target.value);
       setcountries(filteredCountry);
     }
@@ -58,7 +64,8 @@ function App() {
       setcountries(sortedCountry);
       setsortOrder('asc');
     } else {
-      fetchCountryList();
+      var fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
+      setcountries(fetchCountries)
       setsortOrder('none');
     }
   };

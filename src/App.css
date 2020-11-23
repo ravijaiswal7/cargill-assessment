@@ -1,5 +1,5 @@
 body {
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857143;
   color: #333;
@@ -11,33 +11,41 @@ body {
   border: 1px solid #ccc;
 }
 
-.each-header{
+.each-header {
   flex-direction: row;
   flex: 1;
   border-right: 1px solid #ccc;
-  max-width: 187px;
+  max-width: 188px;
   background: #a1a1b2;
   color: #ffffff;
   padding: 5px;
   box-sizing: border-box;
 }
 
-.country-details{
+.each-header:last-child {
+  border-right: none;
+}
+
+.country-details {
   display: flex;
   border: 1px solid #ccc;
 }
 
 .each-detail-item {
   flex-direction: row;
-  flex:1;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   border-right: 1px solid #ccc;
-  max-width: 187px;
+  max-width: 188px;
   padding: 5px;
   box-sizing: border-box;
   display: inline;
+}
+
+.each-detail-item:last-child {
+  border-right: none;
 }
 
 .country-input {
