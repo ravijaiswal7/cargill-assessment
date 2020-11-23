@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import CountriesDropdown from './components/CountriesDropdown'
 import CountriesList from './components/CountriesList';
+import CountriesSearchBox from './components/CountriesSearchBox';
 import './App.css';
 
 function App() {
   const [countries, setcountries] = useState([]);
   const [dropDownValues, setdropDownValues] = useState([])
   const [headers, setheaders] = useState([])
-  const [sortOrder, setsortOrder] = useState('none')
-  const previousCountries = useRef(countries);
+  const [sortOrder, setsortOrder] = useState('desc')
 
   const uuid = (function uuid() {
     var i = 0;
@@ -18,17 +18,19 @@ function App() {
   })()
 
   const fetchCountryList = () => {
-    fetch('https://restcountries.eu/rest/v2/all?fields=name;capital;languages;currencies;region;subregion;population;area')
+    fetch(
+      'https://restcountries.eu/rest/v2/all?fields=name;capital;languages;currencies;region;subregion;population;area'
+    )
       .then(res => res.json())
       .then(res => {
         res.forEach(item => {
-          if(!item.area) {
-            item.area = 0
+          if (!item.area) {
+            item.area = 0;
           }
         });
-        setcountries(res);
-        setdropDownValues(res);
         sessionStorage.setItem('countriesCopy', JSON.stringify(res));
+        setdropDownValues(res);
+        setcountries(res.sort((a, b) => a.population - b.population));
       });
   };
 
@@ -37,15 +39,16 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (previousCountries.current !== countries) {
-      const keyList = Object.keys(countries[0])
+    const fetchCountries = JSON.parse(sessionStorage.getItem('countriesCopy'));
+    if(fetchCountries && fetchCountries.length > 0){
+      const keyList = Object.keys(fetchCountries[0]);
       setheaders(keyList);
     }
   }, [countries]);
 
   const handleChange = e => {
     if (e.target.value === '--Select Country--') {
-      var fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
+      const fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
       setcountries(fetchCountries);
     } else {
       const storedCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
@@ -64,9 +67,19 @@ function App() {
       setcountries(sortedCountry);
       setsortOrder('asc');
     } else {
-      var fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
+      const fetchCountries = JSON.parse(sessionStorage.getItem("countriesCopy"));
       setcountries(fetchCountries)
       setsortOrder('none');
+    }
+  };
+
+  const searchByNameorCode = e => {
+    const fetchCountries = JSON.parse(sessionStorage.getItem('countriesCopy'));
+    if (!e.target.value) {
+      setcountries(fetchCountries);
+    } else {
+      const searchName = e.target.value.toLowerCase();
+      setcountries(fetchCountries.filter(country => country.name.toLowerCase().indexOf(searchName) !== -1));
     }
   };
 
@@ -75,6 +88,7 @@ function App() {
       <div className="country-header">
         <h1>Search for a country</h1>
         <CountriesDropdown handleChange={handleChange} uuid={uuid} dropDownValues={dropDownValues} />
+        <CountriesSearchBox searchByNameorCode={searchByNameorCode} />
       </div>
       <CountriesList
         headers={headers}
